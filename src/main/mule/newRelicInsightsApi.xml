@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:sqs="http://www.mulesoft.org/schema/mule/sqs"
+	xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/sqs http://www.mulesoft.org/schema/mule/sqs/current/mule-sqs.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+	<flow name="sendRequest" doc:id="fc42a5a5-3e3a-41e8-b963-64041856dc8e" >
+		<http:listener doc:name="Listener" doc:id="81517a31-7554-40d3-9fd4-98d1c511caf8" path="/api/{severity}" config-ref="HTTP_Listener_config"/>
+		<set-variable value="#[attributes.uriParams.severity as String]" doc:name="Set Variable" doc:id="a60da955-e0e7-4614-ac8c-638c3d23688a" variableName="severity"/>
+		<logger level="INFO" doc:name="Logger" doc:id="0773aa9f-e932-4dbf-83ab-6852436707b6" message="#[(attributes.uriParams.severity default 'uri_NA') ++ ' ' ++ (vars.severity default 'vars_NA')]"/>
+		<choice doc:name="Choice" doc:id="2b8de3d8-2db9-4857-a8f2-c027cab7800e" >
+			<when expression="#[vars.severity == 'high']">
+				<set-payload value="high" doc:name="Set Payload" doc:id="d8fddda8-e22d-43dc-98d8-e67a6b9560f5" />
+			</when>
+			<when expression="#[vars.severity == 'low']" >
+				<set-payload value="low" doc:name="Set Payload" doc:id="ec660bb3-248a-4ebe-a22e-fa0187b1da39" />
+			</when>
+			<otherwise>
+				<raise-error doc:name="Raise error" doc:id="c16e2ba2-c4e5-404a-9a0d-296fc892e120" description='Endpoint should be either "low" or "high"' type="ANY"/>
+			</otherwise>
+		</choice>
+		<http:request method="POST" doc:name="Request" doc:id="ece59903-0d74-46d9-9552-ddf80867b8e8" config-ref="HTTP_Request_configuration" path="/sqs">
+			<http:headers ><![CDATA[#[output application/java
+---
+{
+	"X-Insert-Key" : "NRII-kNcQBYnR3BrgCrzg27d26jk4cJ7qdiNP"
+}]]]></http:headers>
+		</http:request>
+		<ee:transform doc:name="Transform Message" doc:id="4ec63b2f-954f-498e-8317-102ad54dd372">
+			<ee:message>
+				<ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+payload]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<logger level="INFO" doc:name="Logger" doc:id="ba21941f-dffb-4843-a3a8-9d52b91c5b82" message="#[payload]" />
+		<error-handler >
+			<on-error-continue enableNotifications="true" logException="true" doc:name="On Error Continue" doc:id="b544f4ad-5b0c-47e3-abcf-1050ca5fd540" type="ANY">
+				<set-payload value='#["ERROR Occurred"]' doc:name="Set Payload" doc:id="ed2d5c20-0a83-4a23-b738-c3053019e4a5" />
+			</on-error-continue>
+		</error-handler>
+	</flow>
+</mule>
