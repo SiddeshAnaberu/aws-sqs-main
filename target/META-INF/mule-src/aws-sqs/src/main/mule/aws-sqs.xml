@@ -34,6 +34,44 @@ fromBase64(payload)]]></ee:set-payload>
 		<set-payload doc:name="image" doc:id="3383bfec-1f00-44a0-b631-3cbdc0e4e162" mimeType="image/jpeg" value="payload"/>
 		<file:write doc:name="Write_image" doc:id="0acf5a19-cfc3-4257-8e1f-e3fa6b8b028a" path="C:\Users\siddeshsa\Desktop\idd.jpg" config-ref="File_Config"/>
 		<s3:create-object doc:name="Create image in s3" doc:id="3487213e-a939-4f97-90ad-e457c5034417" config-ref="Amazon_S3_Configuration" bucketName="json-data-sample" key="#['MyFile' ++ (now() as String {format:'yyyy-MM-dd-hh-mm-ss'})++ '.jpg']"/>
+		<error-handler >
+			<on-error-propagate enableNotifications="true" logException="true" doc:name="On Error Propagate" doc:id="328880f7-87b9-4f2b-8eb1-cf24fa68f109" type="S3:ACCESS_DENIED, S3:ACCOUNT_PROBLEM, S3:AMBIGUOUS_GRANT_BY_EMAIL_ADDRESS, S3:BAD_DIGEST, S3:BUCKET_ALREADY_EXISTS, S3:BUCKET_ALREADY_OWNED_BY_YOU, S3:BUCKET_NOT_EMPTY, S3:CONNECTIVITY, S3:CREDENTIALS_NOT_SUPPORTED, S3:CROSS_LOCATION_LOGGING_PROHIBITED, S3:ENTITY_TOO_LARGE, S3:ENTITY_TOO_SMALL, S3:EXPIRED_TOKEN, S3:ILLEGAL_VERSIONING_CONFIGURATION_EXCEPTION, S3:INCOMPLETE_BODY, S3:INCORRECT_NUMBER_OF_FILES_IN_POST_REQUEST, S3:INLINE_DATA_TOO_LARGE, S3:INTERNAL_ERROR, S3:INVALID_ACCESS_KEY_ID, S3:INVALID_ADDRESSING_HEADER, S3:INVALID_ARGUMENT, S3:INVALID_BUCKET_NAME, S3:INVALID_BUCKET_STATE, S3:INVALID_DIGEST, S3:INVALID_ENCRYPTION_ALGORITHM_ERROR, S3:INVALID_LOCATION_CONSTRAINT, S3:INVALID_OBJECT_STATE, S3:INVALID_PART, S3:INVALID_PART_ORDER, S3:INVALID_PAYER, S3:INVALID_POLICY_DOCUMENT, S3:INVALID_RANGE, S3:INVALID_REQUEST, S3:INVALID_RESPONSE_PRESIGNEDURL_MALFORMED, S3:INVALID_SECURITY, S3:INVALID_SOAP_REQUEST, S3:INVALID_STORAGE_CLASS, S3:INVALID_TARGET_BUCKET_FOR_LOGGING, S3:INVALID_TOKEN, S3:INVALID_URI, S3:KEY_TOO_LONG, S3:MALFORMED_ACL_ERROR, S3:MALFORMED_POST_REQUEST, S3:MALFORMED_XML, S3:MAX_MESSAGE_LENGTH_EXCEEDED, S3:MAX_POST_PRE_DATA_LENGTH_EXCEEDED_ERROR, S3:METADATA_TOO_LARGE, S3:METHOD_NOT_ALLOWED, S3:MISSING_ATTACHMENT, S3:MISSING_CONTENT_LENGTH, S3:MISSING_REQUEST_BODY_ERROR, S3:MISSING_SECURITY_ELEMENT, S3:MISSING_SECURITY_HEADER, S3:NOT_IMPLEMENTED, S3:NOT_SIGNED_UP, S3:NO_LOGGING_STATUS_FOR_KEY, S3:NO_SUCH_BUCKET, S3:NO_SUCH_BUCKET_POLICY, S3:NO_SUCH_KEY, S3:NO_SUCH_LIFECYCLE_CONFIGURATION, S3:NO_SUCH_UPLOAD, S3:NO_SUCH_VERSION, S3:OPERATION_ABORTED, S3:PERMANENT_REDIRECT, S3:PRECONDITION_FAILED, S3:REDIRECT, S3:REQUEST_IS_NOT_MULTI_PART_CONTENT, S3:REQUEST_TIMEOUT, S3:REQUEST_TIME_TOO_SKEWED, S3:REQUEST_TORRENT_OF_BUCKET_ERROR, S3:RESTORE_ALREADY_IN_PROGRESS, S3:RETRY_EXHAUSTED, S3:SERVICE_UNAVAILABLE, S3:SIGNATURE_DOES_NOT_MATCH, S3:SLOW_DOWN, S3:TEMPORARY_REDIRECT, S3:TOKEN_REFRESH_REQUIRED, S3:TOO_MANY_BUCKETS, S3:UNEXPECTED_CONTENT, S3:UNKNOWN, S3:UNRESOLVABLE_GRANT_BY_EMAIL_ADDRESS, S3:USER_KEY_MUST_BE_SPECIFIED">
+				<ee:transform doc:name="Transform Message" doc:id="2adbbd5a-1d6a-4dd7-982e-f780b6a34f3b" >
+					<ee:message >
+						<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{
+	"message": 'S3 error with message : '++ error.description as String
+}]]></ee:set-payload>
+					</ee:message>
+				</ee:transform>
+			</on-error-propagate>
+			<on-error-continue enableNotifications="true" logException="true" doc:name="On Error Continue" doc:id="a146bc48-daa7-4b8e-bc15-ef5578fefd0f" type="FILE:FILE_ALREADY_EXISTS">
+				<ee:transform doc:name="Transform Message" doc:id="129c9b71-51ea-4789-9ba3-d56fcdfa1fc3" >
+					<ee:message >
+						<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{
+	"message" : error.description
+}]]></ee:set-payload>
+					</ee:message>
+				</ee:transform>
+				<set-variable value="403" doc:name="Set Variable" doc:id="854e2ae3-11cf-4708-9444-b1b0593e46d7" variableName="httpStatus"/>
+			</on-error-continue>
+			<on-error-continue enableNotifications="true" logException="true" doc:name="On Error Continue" doc:id="fd9fbb2a-3059-45cc-b8f2-3c1ca0cdd524" type="FILE:ILLEGAL_CONTENT">
+				<ee:transform doc:name="Transform Message" doc:id="91b84939-3164-405c-96b6-312c95f0d155" >
+					<ee:message >
+						<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{
+	"message" : 'Check your base64 encoded data. resulting error is : '+ error.description as String}]]></ee:set-payload>
+					</ee:message>
+				</ee:transform>
+			</on-error-continue>
+		</error-handler>
 	</flow>
 	<flow name="device_two" doc:id="87a70444-5917-4f77-a389-036f2560a9b4" >
 		<http:listener doc:name="Listener" doc:id="95f59ea3-17d4-4390-8a97-71577668249e" config-ref="HTTP_Listener_config" path="/point2"/>
@@ -87,6 +125,20 @@ payload]]></ee:set-payload>
 			</ee:message>
 		</ee:transform>
 		<logger level="INFO" doc:name="Logger" doc:id="160188eb-dff7-48ba-a363-0e3a6203004b" message="#[payload]" />
+		<error-handler >
+			<on-error-propagate enableNotifications="true" logException="true" doc:name="On Error Propagate" doc:id="38ed0930-1ba4-469f-b4f4-3d48a58fe0a8" type="SQS:ACCESS_DENIED, SQS:CONNECTIVITY, SQS:INTERNAL_FAILURE, SQS:INVALID_CREDENTIALS, SQS:INVALID_DATA, SQS:MESSAGE_SIZE_THRESHOLD_OUT_OF_RANGE, SQS:OPT_IN_REQUIRED, SQS:PARAMETER_OUT_OF_RANGE, SQS:REQUEST_EXPIRED, SQS:RETRY_EXHAUSTED, SQS:S3_BUCKET_ACCESS_DENIED, SQS:S3_BUCKET_NOT_FOUND, SQS:SERVICE_UNAVAILABLE, SQS:THROTTLING_EXCEPTION">
+				<ee:transform doc:name="SQS Message" doc:id="5d3f2347-fa7d-4de5-87fd-2f89221c32b6" >
+					<ee:message >
+						<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{
+	"message": 'SQS exception with message : '++ error.description as String
+}]]></ee:set-payload>
+					</ee:message>
+				</ee:transform>
+			</on-error-propagate>
+		</error-handler>
 	</flow>
 		<flow name="aws-sqs-reciever" doc:id="42604849-d790-4f18-89cd-5516457568cb" >
 		<sqs:receivemessages doc:name="Receive messages" doc:id="ad978c9d-b8bf-44fa-9a23-4ad2bbed4416" config-ref="Amazon_SQS_Configuration" queueUrl="https://sqs.us-east-2.amazonaws.com/277183012111/testSQS"/>
@@ -113,7 +165,17 @@ payload]]></ee:set-payload>
 &#10;    action: &quot;Request received&quot;
 &#10; }]"/>
 		<error-handler >
-			<on-error-propagate enableNotifications="true" logException="true" doc:name="On Error Propagate" doc:id="5345bb2f-3b65-433a-a3e9-442efbfdab1c" >
+			<on-error-propagate enableNotifications="true" logException="true" doc:name="On Error Propagate" doc:id="5345bb2f-3b65-433a-a3e9-442efbfdab1c" type="ANY">
+				<ee:transform doc:name="Transform Message" doc:id="d74da473-ac2b-44dc-9d9b-8c4f863cc87e" >
+					<ee:message >
+						<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{
+	"message" : error.description
+}]]></ee:set-payload>
+					</ee:message>
+				</ee:transform>
 				<logger level="INFO" doc:name="Logger" doc:id="1db8d331-1616-4e8d-b005-1f6e49bafaa9" message="#[%dw 2.0
 &#10;output application/json
 &#10;---
@@ -130,6 +192,18 @@ payload]]></ee:set-payload>
 &#10;    action: &quot;Error caught&quot;
 &#10;}]"/>
 			</on-error-propagate>
+			<on-error-propagate enableNotifications="true" logException="true" doc:name="On Error Propagate" doc:id="0d7a5a06-2a92-4c98-a444-9be7b53dee6c" type="SQS:ACCESS_DENIED, SQS:CONNECTIVITY, SQS:INTERNAL_FAILURE, SQS:INVALID_CREDENTIALS, SQS:INVALID_DATA, SQS:MESSAGE_SIZE_THRESHOLD_OUT_OF_RANGE, SQS:OPT_IN_REQUIRED, SQS:PARAMETER_OUT_OF_RANGE, SQS:REQUEST_EXPIRED, SQS:RETRY_EXHAUSTED, SQS:S3_BUCKET_ACCESS_DENIED, SQS:S3_BUCKET_NOT_FOUND, SQS:SERVICE_UNAVAILABLE, SQS:THROTTLING_EXCEPTION" >
+				<ee:transform doc:name="SQS Message" doc:id="66e3e730-49f3-4df5-928c-d986a965704b" >
+					<ee:message >
+						<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{
+	"message": 'SQS exception with message : '++ error.description as String
+}]]></ee:set-payload>
+					</ee:message>
+				</ee:transform>
+			</on-error-propagate>
 		</error-handler>
 	</flow>
 	<flow name="aws-sqsFlow1" doc:id="3b7cb8e0-fb62-480c-a5a8-068c99f3a9d2" >
@@ -143,6 +217,33 @@ payload]]></ee:set-payload>
 			</ee:message>
 		</ee:transform>
 		<logger level="INFO" doc:name="Logger" doc:id="9b331b90-f847-4987-9cfc-515cd6cd7af1" message='#[payload as String ++ "secondreciver"]'/>
+		<error-handler >
+			<on-error-propagate enableNotifications="true" logException="true" doc:name="On Error Propagate" doc:id="b946fa93-82ba-44c1-9422-9cdd6b3fd679" type="ANY">
+				<ee:transform doc:name="Transform Message" doc:id="dd8ca690-dfe6-457b-927f-82bc42fc1523" >
+					<ee:message >
+						<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{
+	"message" : error.description
+}]]></ee:set-payload>
+					</ee:message>
+				</ee:transform>
+				<logger level="INFO" doc:name="Logger" doc:id="dbad0cb3-d111-4fdc-a5ef-63b791eb8b3e" message="#[%dw 2.0&#10;&#10;output application/json&#10;&#10;---&#10;&#10;{&#10;&#10;    severity: &quot;Error&quot;,&#10;&#10;    eventType: &quot;MulesLogs&quot;,&#10;&#10;    env: &quot;DEV&quot;,&#10;&#10;    messageId: uuid() as String,&#10;&#10;    muleAppName: &quot;policy-demo1&quot;,&#10;&#10;    intgCreationDate: now() as String {format: &quot;yyyy-MM-dd'T'HH:mm:ss.ss'Z'&quot;},&#10;&#10;    payload: write(error.detailedDescription,'application/json'),&#10;&#10;    resultMessage: error.detailedDescription default ' ',&#10;&#10;    result: &quot;Error&quot;,&#10;&#10;    action: &quot;Error caught&quot;&#10;&#10;}]" />
+			</on-error-propagate>
+			<on-error-propagate enableNotifications="true" logException="true" doc:name="On Error Propagate" doc:id="0fed13c5-e445-46ae-92ff-851a57adb16c" type="SQS:ACCESS_DENIED, SQS:CONNECTIVITY, SQS:INTERNAL_FAILURE, SQS:INVALID_CREDENTIALS, SQS:INVALID_DATA, SQS:MESSAGE_SIZE_THRESHOLD_OUT_OF_RANGE, SQS:OPT_IN_REQUIRED, SQS:PARAMETER_OUT_OF_RANGE, SQS:REQUEST_EXPIRED, SQS:RETRY_EXHAUSTED, SQS:S3_BUCKET_ACCESS_DENIED, SQS:S3_BUCKET_NOT_FOUND, SQS:SERVICE_UNAVAILABLE, SQS:THROTTLING_EXCEPTION" >
+				<ee:transform doc:name="SQS Message" doc:id="b92022c2-eafd-4cab-a6fb-9e73ebc2cccb" >
+					<ee:message >
+						<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{
+	"message": 'SQS exception with message : '++ error.description as String
+}]]></ee:set-payload>
+					</ee:message>
+				</ee:transform>
+			</on-error-propagate>
+		</error-handler>
 	</flow>
 	
 	<flow name="use-caseFlow" doc:id="c2eac04b-df01-43b5-b31c-a855a2177197" >
@@ -179,7 +280,17 @@ output application/json
 &#10;    action: &quot;Request received&quot;
 &#10; }]"/>
 		<error-handler >
-			<on-error-continue enableNotifications="true" logException="true" doc:name="On Error Continue" doc:id="ba4743ab-fa63-4f26-8c4b-40743b6ed44a" >
+			<on-error-continue enableNotifications="true" logException="true" doc:name="On Error Continue" doc:id="ba4743ab-fa63-4f26-8c4b-40743b6ed44a" type="EXPRESSION">
+				<ee:transform doc:name="Transform Message" doc:id="ed577dde-3b0f-49a9-ba53-2ffd1106fb4a" >
+					<ee:message >
+						<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{
+	"message": 'error when transforming dataweave expression'
+}]]></ee:set-payload>
+					</ee:message>
+				</ee:transform>
 				<logger level="INFO" doc:name="Logger" doc:id="4a871952-a140-4b51-b0f4-2dc410b246cf" message="#[%dw 2.0
 &#10;output application/json
 &#10;---

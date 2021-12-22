@@ -39,7 +39,16 @@ payload]]></ee:set-payload>
 		<logger level="INFO" doc:name="Logger" doc:id="ba21941f-dffb-4843-a3a8-9d52b91c5b82" message="#[payload]" />
 		<error-handler >
 			<on-error-continue enableNotifications="true" logException="true" doc:name="On Error Continue" doc:id="b544f4ad-5b0c-47e3-abcf-1050ca5fd540" type="ANY">
-				<set-payload value='#["ERROR Occurred"]' doc:name="Set Payload" doc:id="ed2d5c20-0a83-4a23-b738-c3053019e4a5" />
+				<ee:transform doc:name="Transform Message" doc:id="8403cb02-fa21-42ef-9b31-658602b71831" >
+					<ee:message >
+						<ee:set-payload ><![CDATA[%dw 2.0
+output application/java
+---
+{
+	"message": error.description
+}]]></ee:set-payload>
+					</ee:message>
+				</ee:transform>
 			</on-error-continue>
 		</error-handler>
 	</flow>

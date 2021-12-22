@@ -1,6 +1,7 @@
 {
   "configs": [
     "aws-sqs.xml",
+    "aws-sqs-suite.xml",
     "newRelicInsightsApi.xml"
   ],
   "secureProperties": [],
@@ -11,13 +12,32 @@
   "classLoaderModelLoaderDescriptor": {
     "id": "mule",
     "attributes": {
-      "exportedPackages": [],
       "exportedResources": [
         "application-types.xml",
         "aws-sqs.xml",
         "log4j2.xml",
-        "newRelicInsightsApi.xml"
-      ]
+        "newRelicInsightsApi.xml",
+        "awssqsFlowtest/assert_expression_payload.dwl",
+        "awssqsFlowtest/mock_attributes.dwl",
+        "awssqsFlowtest/mock_attributes1.dwl",
+        "awssqsFlowtest/mock_payload.dwl",
+        "awssqsFlowtest/mock_payload1.dwl",
+        "awssqsFlowtest/set-event_attributes.dwl",
+        "awssqsFlowtest/set-event_payload.dwl",
+        "FLOW2test/assert_expression_payload.dwl",
+        "FLOW2test/mock_attributes.dwl",
+        "FLOW2test/mock_payload.dwl",
+        "FLOW2test/set-event_attributes.dwl",
+        "FLOW2test/set-event_payload.dwl",
+        "FLOW3test/assert_expression_payload.dwl",
+        "FLOW3test/mock_attributes.dwl",
+        "FLOW3test/mock_payload.dwl",
+        "FLOW3test/set-event_attributes.dwl",
+        "FLOW3test/set-event_payload.dwl",
+        "log4j2-test.xml"
+      ],
+      "includeTestDependencies": "true",
+      "exportedPackages": []
     }
   },
   "bundleDescriptorLoader": {
