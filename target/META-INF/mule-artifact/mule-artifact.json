@@ -14,7 +14,6 @@
       "exportedPackages": [],
       "exportedResources": [
         "application-types.xml",
-        "aws-sqs-suite.xml",
         "aws-sqs.xml",
         "log4j2.xml",
         "newRelicInsightsApi.xml"
