@@ -46,6 +46,7 @@ output application/json
 }]]></ee:set-payload>
 					</ee:message>
 				</ee:transform>
+				<logger level="INFO" doc:name="Logger" doc:id="66c3c729-be04-45f0-931d-6d4298001f8d" />
 			</on-error-propagate>
 			<on-error-continue enableNotifications="true" logException="true" doc:name="On Error Continue" doc:id="a146bc48-daa7-4b8e-bc15-ef5578fefd0f" type="FILE:FILE_ALREADY_EXISTS">
 				<ee:transform doc:name="Transform Message" doc:id="129c9b71-51ea-4789-9ba3-d56fcdfa1fc3" >
@@ -54,22 +55,11 @@ output application/json
 output application/json
 ---
 {
-	"message" : error.description
+	"message" : 'File already exists'
 }]]></ee:set-payload>
 					</ee:message>
 				</ee:transform>
 				<set-variable value="403" doc:name="Set Variable" doc:id="854e2ae3-11cf-4708-9444-b1b0593e46d7" variableName="httpStatus"/>
-			</on-error-continue>
-			<on-error-continue enableNotifications="true" logException="true" doc:name="On Error Continue" doc:id="fd9fbb2a-3059-45cc-b8f2-3c1ca0cdd524" type="FILE:ILLEGAL_CONTENT">
-				<ee:transform doc:name="Transform Message" doc:id="91b84939-3164-405c-96b6-312c95f0d155" >
-					<ee:message >
-						<ee:set-payload ><![CDATA[%dw 2.0
-output application/json
----
-{
-	"message" : 'Check your base64 encoded data. resulting error is : '+ error.description as String}]]></ee:set-payload>
-					</ee:message>
-				</ee:transform>
 			</on-error-continue>
 		</error-handler>
 	</flow>

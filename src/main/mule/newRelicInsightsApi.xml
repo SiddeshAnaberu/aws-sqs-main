@@ -42,7 +42,7 @@ payload]]></ee:set-payload>
 				<ee:transform doc:name="Transform Message" doc:id="8403cb02-fa21-42ef-9b31-658602b71831" >
 					<ee:message >
 						<ee:set-payload ><![CDATA[%dw 2.0
-output application/java
+output application/json
 ---
 {
 	"message": error.description

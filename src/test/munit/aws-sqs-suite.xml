@@ -45,29 +45,29 @@ assert_expression_payload::main({payload: payload, attributes: attributes, vars:
 			</munit-tools:assert>
 		</munit:validation>
 	</munit:test>
-	<munit:test name="FLOW3-test" doc:id="a5ce1f9c-23b1-4431-bbfc-ed61570c8c17" >
+	<munit:test name="FLOW1-test" doc:id="a5ce1f9c-23b1-4431-bbfc-ed61570c8c17" >
 		<munit:behavior >
 			<munit-tools:mock-when doc:name="Mock Request" doc:id="42186167-198d-43f7-a730-fd080aae6843" processor="http:request">
 				<munit-tools:with-attributes >
-					<munit-tools:with-attribute whereValue="b98f240d-83bb-4c30-8ee1-438516e07735" attributeName="doc:id" />
+					<munit-tools:with-attribute whereValue="67c7ea9f-180f-46ea-b4d3-efc1eb1af08b" attributeName="doc:id" />
 				</munit-tools:with-attributes>
 				<munit-tools:then-return >
-					<munit-tools:payload value="#[output application/json --- readUrl('classpath://FLOW3test\mock_payload.dwl')]" mediaType="application/json" encoding="UTF-8" />
-					<munit-tools:attributes value="#[readUrl('classpath://FLOW3test\mock_attributes.dwl')]" />
+					<munit-tools:payload value="#[output application/json --- readUrl('classpath://FLOW1test\mock_payload.dwl')]" mediaType="application/json" encoding="UTF-8" />
+					<munit-tools:attributes value="#[readUrl('classpath://FLOW1test\mock_attributes.dwl')]" />
 				</munit-tools:then-return>
 			</munit-tools:mock-when>
 			<munit:set-event doc:name="Set Input" doc:id="2215023e-34d8-4c75-92ed-a79f2a9cac0b" >
-				<munit:payload value="#[readUrl('classpath://FLOW3test\set-event_payload.dwl')]" encoding="UTF-8" />
-				<munit:attributes value="#[readUrl('classpath://FLOW3test\set-event_attributes.dwl')]" />
+				<munit:payload value="#[readUrl('classpath://FLOW1test\set-event_payload.dwl')]" encoding="UTF-8" />
+				<munit:attributes value="#[readUrl('classpath://FLOW1test\set-event_attributes.dwl')]" />
 			</munit:set-event>
 		</munit:behavior>
 		<munit:execution >
-			<flow-ref doc:name="Flow-ref to FLOW3" doc:id="5f67743a-52a6-44e4-ade6-875bf5bf5242" name="device_one"/>
+			<flow-ref doc:name="Flow-ref to FLOW1" doc:id="5f67743a-52a6-44e4-ade6-875bf5bf5242" name="device_one"/>
 		</munit:execution>
 		<munit:validation >
 			<munit-tools:assert doc:name="Assert payload" doc:id="866829cd-d565-4060-914c-750b90d5efe3" message="The payload does not match">
 				<munit-tools:that ><![CDATA[#[%dw 2.0
-import FLOW3test::assert_expression_payload
+import FLOW1test::assert_expression_payload
 ---
 assert_expression_payload::main({payload: payload, attributes: attributes, vars: vars})]]]></munit-tools:that>
 			</munit-tools:assert>
@@ -77,7 +77,7 @@ assert_expression_payload::main({payload: payload, attributes: attributes, vars:
 		<munit:behavior >
 			<munit-tools:mock-when doc:name="Mock Request" doc:id="321c37d5-2e9b-466f-a8de-7dc33770a3c7" processor="http:request">
 				<munit-tools:with-attributes >
-					<munit-tools:with-attribute whereValue="3b0ff253-c256-4c10-a3bb-0883581fe973" attributeName="doc:id" />
+					<munit-tools:with-attribute whereValue="c5c132e7-9bfa-4c4e-b543-d2c2dc732162" attributeName="doc:id" />
 				</munit-tools:with-attributes>
 				<munit-tools:then-return >
 					<munit-tools:payload value="#[output application/json --- readUrl('classpath://FLOW2test\mock_payload.dwl')]" mediaType="application/json" encoding="UTF-8" />
@@ -90,7 +90,7 @@ assert_expression_payload::main({payload: payload, attributes: attributes, vars:
 			</munit:set-event>
 		</munit:behavior>
 		<munit:execution >
-			<flow-ref doc:name="Flow-ref to FLOW2" doc:id="51d6dac5-d170-4d39-a49a-3f4671fbbf93" name="device_one"/>
+			<flow-ref doc:name="Flow-ref to FLOW2" doc:id="51d6dac5-d170-4d39-a49a-3f4671fbbf93" name="device_two"/>
 		</munit:execution>
 		<munit:validation >
 			<munit-tools:assert doc:name="Assert payload" doc:id="aaa5c7b3-cd2c-4838-a37d-bfc2677fe75a" message="The payload does not match">
@@ -101,6 +101,86 @@ assert_expression_payload::main({payload: payload, attributes: attributes, vars:
 			</munit-tools:assert>
 		</munit:validation>
 	</munit:test>
-
+	<munit:test name="aws-s3-test" doc:id="ab4d701c-9521-4fdc-8f80-8e8a7754022e" >
+		<munit:behavior >
+			<munit:set-event doc:name="Set Input" doc:id="bc980fac-c11a-4b12-8704-e047e86321d6" >
+				<munit:payload value="#[readUrl('classpath://awss3test\set-event_payload.dwl')]" encoding="UTF-8" />
+				<munit:attributes value="#[readUrl('classpath://awss3test\set-event_attributes.dwl')]" />
+			</munit:set-event>
+		</munit:behavior>
+		<munit:execution >
+			<flow-ref doc:name="Flow-ref to aws-s3" doc:id="f607dd05-b4c1-4ba8-a91d-900b2ad94c45" name="aws-s3"/>
+		</munit:execution>
+		<munit:validation >
+			<munit-tools:assert doc:name="Assert payload" doc:id="ea048f39-8bd3-45b7-be64-ecaa7d6071d0" message="The payload does not match">
+				<munit-tools:that ><![CDATA[#[%dw 2.0
+import awss3test::assert_expression_payload
+---
+assert_expression_payload::main({payload: payload, attributes: attributes, vars: vars})]]]></munit-tools:that>
+			</munit-tools:assert>
+		</munit:validation>
+	</munit:test>
+	
+	<munit:test name="aws-s3-error-test" doc:id="5697e099-d2fa-4719-b0ea-634c29eb40eb" expectedErrorType="S3:CONNECTIVITY">
+		<munit:behavior >
+			<munit:set-event doc:name="Set Input" doc:id="ac74332e-2453-41ec-8c23-1f20b583592b" >
+				<munit:payload value="#[readUrl('classpath://awss3test\set-event_payload.dwl')]" encoding="UTF-8" />
+				<munit:attributes value="#[readUrl('classpath://awss3test\set-event_attributes.dwl')]" />
+			</munit:set-event>
+			<munit-tools:mock-when doc:name="Mock when" doc:id="91f489a3-8674-4511-860d-c12a90a2715d" processor="s3:create-object">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="3487213e-a939-4f97-90ad-e457c5034417" attributeName="doc:id" />
+				</munit-tools:with-attributes>
+				<munit-tools:then-return >
+					<munit-tools:error typeId="S3:CONNECTIVITY" />
+				</munit-tools:then-return>
+			</munit-tools:mock-when>
+		</munit:behavior>
+		<munit:execution >
+			<flow-ref doc:name="Flow-ref to aws-s3" doc:id="5bcb6c44-3e55-4bae-bdee-ee5524779585" name="aws-s3"/>
+		</munit:execution>
+		<munit:validation>
+			<munit-tools:assert-that doc:name="Assert that" doc:id="442c1e7f-ee03-42b0-8d41-615adbae222a" is="#[MunitTools::equalTo('S3 error with message : '++ error.description as String&#10;)]" expression="#[payload.message]"/>
+		</munit:validation>
+	</munit:test>
+	
+	<munit:test name="aws-s3-file-exists-test" doc:id="e95a5d1f-185f-4986-88f6-ad1483af27ea" >
+		<munit:behavior >
+			<munit:set-event doc:name="Set Input" doc:id="8284bc58-5b92-47c6-ac79-e6dd223cfa82" >
+				<munit:payload value="#[readUrl('classpath://awss3test\set-event_payload.dwl')]" encoding="UTF-8" />
+				<munit:attributes value="#[readUrl('classpath://awss3test\set-event_attributes.dwl')]" />
+			</munit:set-event>
+			<munit-tools:mock-when doc:name="Mock when" doc:id="f88b5ec9-3185-4d02-b40a-8b0961db99ed" processor="file:write">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="0acf5a19-cfc3-4257-8e1f-e3fa6b8b028a" attributeName="doc:id" />
+				</munit-tools:with-attributes>
+				<munit-tools:then-return >
+					<munit-tools:error typeId="FILE:FILE_ALREADY_EXISTS" />
+				</munit-tools:then-return>
+			</munit-tools:mock-when>
+		</munit:behavior>
+		<munit:execution >
+			<flow-ref doc:name="Flow-ref to aws-s3" doc:id="3802b58b-c042-40a1-a1e5-68bee9fc2b6f" name="aws-s3"/>
+		</munit:execution>
+		<munit:validation>
+			<munit-tools:assert-that doc:name="Assert that" doc:id="fac22415-a82d-4504-9f48-fbbbfc993ef5" is="#[MunitTools::equalTo('File already exists')]" expression='#[payload.message]'/>
+		</munit:validation>
+	</munit:test>
+	
+<munit:test name="aws-sqs-recieverTest" doc:id="bccb5ffa-c4c4-44f3-9369-898b41a7762f" description="Test">
+		<munit:execution >
+			<flow-ref doc:name="Flow-ref to aws-sqs-reciever" doc:id="22dd4cc5-881b-4c4e-93f4-04aadda490f7" name="aws-sqs-reciever"/>
+		</munit:execution>
+	</munit:test>
+	<munit:test name="aws-sqsFlow1Test" doc:id="a7b6e48e-583f-427c-bab1-89de8d2d5f62" description="Test">
+		<munit:execution >
+			<flow-ref doc:name="Flow-ref to aws-sqsFlow1" doc:id="a1957e28-04fa-42c5-8dc3-a9211fef0b86" name="aws-sqsFlow1"/>
+		</munit:execution>
+	</munit:test>
+	<munit:test name="use-caseFlowTest" doc:id="48288fdc-6d87-49a4-8c69-703054f6bb03" description="Test">
+		<munit:execution >
+			<flow-ref doc:name="Flow-ref to use-caseFlow" doc:id="8aa3d413-a8f6-442e-9a07-f0bb9076bcb1" name="use-caseFlow"/>
+		</munit:execution>
+	</munit:test>
 
 </mule>
