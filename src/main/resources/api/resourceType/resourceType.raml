@@ -1,0 +1,36 @@
+#%RAML 1.0 Library
+
+traits:
+  errorResp: !include ../traits/trait.raml
+
+securitySchemes:
+  customSecurity: !include ../securitySchemes/securityScheme.raml
+
+
+resourceTypes:
+  appCollection:
+    is: [headerTrait,errorResp]   
+    securedBy:
+        - customSecurity             
+    get?:
+      description: This is used to fetch <<resourcePathName>>
+      
+      responses:
+        200:
+          body:
+            application/json:
+              
+
+    post?:
+      description: This is used create/add <<resourcePathName>>
+      
+      body:
+        application/json:
+          
+      responses:
+        201:
+          body:
+            application/json:
+             
+
+    

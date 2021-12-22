@@ -1,0 +1,45 @@
+#%RAML 1.0
+
+title: Aws-Sqs
+
+mediaType: [application/json, application/xml]
+traits:
+  errTrait: !include traits/trait.raml
+
+uses:
+  appResources: resourceType/resourceType.raml
+
+protocols:
+  - HTTP
+  - HTTPS
+
+/usecase:
+
+  /{operator}:
+    get:
+    post:
+      
+/api:
+  /{severity}:
+    get:
+    post:
+    
+/sqs:
+    get:
+    post:
+
+/amazons3:
+  get:
+  post:
+
+/point2:
+  get:
+  post:
+    
+/point1:
+  get:
+  post:
+
+
+
+    

@@ -1,0 +1,10 @@
+#%RAML 1.0 SecurityScheme
+type: x-clientIdEnforcement
+
+describedBy:
+  headers:
+    Authorization:
+  responses:
+    401:
+      description:
+        "Un-Authorized Access"
