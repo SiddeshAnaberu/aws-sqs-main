@@ -7,7 +7,6 @@ http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/htt
 http://www.mulesoft.org/schema/mule/sqs http://www.mulesoft.org/schema/mule/sqs/current/mule-sqs.xsd
 http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
 	<flow name="sendRequest" doc:id="fc42a5a5-3e3a-41e8-b963-64041856dc8e" >
-		<http:listener doc:name="Listener" doc:id="81517a31-7554-40d3-9fd4-98d1c511caf8" path="/api/{severity}" config-ref="HTTP_Listener_config"/>
 		<set-variable value="#[attributes.uriParams.severity as String]" doc:name="Set Variable" doc:id="a60da955-e0e7-4614-ac8c-638c3d23688a" variableName="severity"/>
 		<logger level="INFO" doc:name="Logger" doc:id="0773aa9f-e932-4dbf-83ab-6852436707b6" message="#[(attributes.uriParams.severity default 'uri_NA') ++ ' ' ++ (vars.severity default 'vars_NA')]"/>
 		<choice doc:name="Choice" doc:id="2b8de3d8-2db9-4857-a8f2-c027cab7800e" >

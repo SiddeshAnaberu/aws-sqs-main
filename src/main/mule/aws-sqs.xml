@@ -8,9 +8,6 @@ http://www.mulesoft.org/schema/mule/sqs http://www.mulesoft.org/schema/mule/sqs/
 http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd
 http://www.mulesoft.org/schema/mule/s3 http://www.mulesoft.org/schema/mule/s3/current/mule-s3.xsd
 http://www.mulesoft.org/schema/mule/file http://www.mulesoft.org/schema/mule/file/current/mule-file.xsd">
-	<http:listener-config name="HTTP_Listener_config" doc:name="HTTP Listener config" doc:id="99a849f4-8083-4fab-9b06-784d7eff2d80" >
-		<http:listener-connection host="0.0.0.0" port="8081" />
-	</http:listener-config>
 	<sqs:config name="Amazon_SQS_Configuration" doc:name="Amazon SQS Configuration" doc:id="086d69da-b1a6-40bc-b439-435012f696d2" >
 		<sqs:basic-connection accessKey="AKIAUBCLFDUHR3OG7F5E" secretKey="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" />
 	</sqs:config>
@@ -22,7 +19,6 @@ http://www.mulesoft.org/schema/mule/file http://www.mulesoft.org/schema/mule/fil
 	</s3:config>
 	<file:config name="File_Config" doc:name="File Config" doc:id="60d0640f-4569-412a-8853-28a354e5cb69" />
 	<flow name="aws-s3" doc:id="190a16fb-7d99-4529-9060-359269fd8468" >
-		<http:listener doc:name="Listener" doc:id="d2c01ace-a8b2-401e-96a8-156f24b5e338" config-ref="HTTP_Listener_config" path="/amazons3"/>
 		<ee:transform doc:name="base64encoding" doc:id="8dab9fee-c95b-43fc-aba2-00b904e47c50" >
 			<ee:message >
 				<ee:set-payload ><![CDATA[%dw 2.0
@@ -64,17 +60,14 @@ output application/json
 		</error-handler>
 	</flow>
 	<flow name="device_two" doc:id="87a70444-5917-4f77-a389-036f2560a9b4" >
-		<http:listener doc:name="Listener" doc:id="95f59ea3-17d4-4390-8a97-71577668249e" config-ref="HTTP_Listener_config" path="/point2"/>
 		<logger level="INFO" doc:name="Logger" doc:id="bb65eae6-1f07-4752-832a-4e846245d6dd" message="calling from device 2"/>
-		<http:request method="POST" doc:name="Request" doc:id="c5c132e7-9bfa-4c4e-b543-d2c2dc732162" config-ref="HTTP_Request_configuration" path="/sqs"/>
+		<flow-ref doc:name="Flow Reference" doc:id="711df7c9-ab32-40cc-ab2d-13e04e7e5823" name="aws-sqsFlow"/>
 	</flow>
 	<flow name="device_one" doc:id="6093be47-74ff-4ea4-a535-248a2e1c91b5" >
-		<http:listener doc:name="Listener" doc:id="3959cfd1-a569-439e-90be-37084b210244" config-ref="HTTP_Listener_config" path="/point1"/>
 		<logger level="INFO" doc:name="Logger" doc:id="f2d5c173-bb62-4329-90a6-a94501030fd3" message="calling from device 1"/>
-		<http:request method="POST" doc:name="Request" doc:id="67c7ea9f-180f-46ea-b4d3-efc1eb1af08b" config-ref="HTTP_Request_configuration" path="/sqs"/>
+		<flow-ref doc:name="Flow Reference" doc:id="994d877a-77dd-4cd8-b79c-9be80e0a7f60" name="aws-sqsFlow"/>
 	</flow>
 	<flow name="aws-sqsFlow" doc:id="98ce9b94-9b59-402f-8bf1-a2dd29809c0f" >
-		<http:listener doc:name="Listener" doc:id="0b128d6f-775c-4b31-acd8-b8f2c630d4da" path="/sqs" config-ref="HTTP_Listener_config"/>
 		<ee:transform doc:name="Transform Message to sqs format" doc:id="971592cb-b534-40c5-8216-79e487bbbb23" >
 			<ee:message >
 				<ee:set-payload ><![CDATA[%dw 2.0
@@ -237,7 +230,6 @@ output application/json
 	</flow>
 	
 	<flow name="use-caseFlow" doc:id="c2eac04b-df01-43b5-b31c-a855a2177197" >
-		<http:listener doc:name="Listener" doc:id="1dbff51f-124f-459d-b261-0fd3369c58a9" config-ref="HTTP_Listener_config" path="/usecase/{operator}"/>
 		<set-variable value='#[attributes.uriParams."operator"]' doc:name="Set Variable" doc:id="83721422-08f0-4d5c-842a-1f1257b0e999" variableName="operator"/>
 		<ee:transform doc:name="Transform Message" doc:id="4ed5fbe7-9d38-4113-a481-7707f5197784" >
 			<ee:message >
